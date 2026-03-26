@@ -4,7 +4,7 @@ from flask_cors import CORS
 import sqlite3
 
 app = Flask(__name__) # ✅ FIRST define app
-CORS(app) 
+CORS(app, origins="*") 
 DB_NAME = "yt_vid.db"
 
 
