@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>3D Video Manager</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: sans-serif;
+    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+    color: white;
+}
+
+.container {
+    max-width: 900px;
+    margin: auto;
+    padding: 20px;
+}
+
+.card {
+    background: rgba(255,255,255,0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    padding: 20px;
+    margin: 20px 0;
+    transform: perspective(1000px) rotateX(0deg) rotateY(0deg);
+    transition: 0.3s;
+}
+
+.card:hover {
+    transform: perspective(1000px) rotateX(5deg) rotateY(5deg) scale(1.03);
+}
+
+input {
+    padding: 10px;
+    margin: 5px;
+    border-radius: 8px;
+    border: none;
+}
+
+button {
+    padding: 10px;
+    border: none;
+    border-radius: 8px;
+    margin: 5px;
+    cursor: pointer;
+}
+
+.add { background: #00c896; }
+.delete { background: #ff4d4d; }
+.update { background: #ffaa00; }
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>🎬 3D Video Manager</h1>
+
+<input id="name" placeholder="Video Name">
+<input id="time" placeholder="Time">
+<button class="add" onclick="addVideo()">Add</button>
+
+<div id="videos"></div>
+
+</div>
+
+<script>
+
+const API = "/videos";
+
+async function loadVideos() {
+    const res = await fetch(API);
+    const data = await res.json();
+
+    const container = document.getElementById("videos");
+    container.innerHTML = "";
+
+    data.forEach(v => {
+        container.innerHTML += `
+        <div class="card">
+            <h3>${v.name}</h3>
+            <p>${v.time}</p>
+
+            <button class="delete" onclick="deleteVideo(${v.id})">Delete</button>
+            <button class="update" onclick="editVideo(${v.id})">Edit</button>
+        </div>
+        `;
+    });
+}
+
+async function addVideo() {
+    const name = document.getElementById("name").value;
+    const time = document.getElementById("time").value;
+
+    await fetch(API, {
+        method: "POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({name, time})
+    });
+
+    loadVideos();
+}
+
+async function deleteVideo(id) {
+    await fetch(`${API}/${id}`, { method: "DELETE" });
+    loadVideos();
+}
+
+function editVideo(id) {
+    const name = prompt("New name:");
+    const time = prompt("New time:");
+
+    fetch(`${API}/${id}`, {
+        method: "PUT",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({name, time})
+    }).then(loadVideos);
+}
+
+loadVideos();
+
+</script>
+
+</body>
+</html>
