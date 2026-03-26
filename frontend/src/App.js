@@ -8,13 +8,9 @@ function App() {
   const [time, setTime] = useState("");
 
   const loadVideos = async () => {
-    try {
-      const res = await fetch(API);
-      const data = await res.json();
-      setVideos(data);
-    } catch (err) {
-      console.error("Error loading videos:", err);
-    }
+    const res = await fetch(API);
+    const data = await res.json();
+    setVideos(data);
   };
 
   useEffect(() => {
@@ -26,9 +22,7 @@ function App() {
 
     await fetch(API, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name, time }),
     });
 
@@ -38,23 +32,19 @@ function App() {
   };
 
   const deleteVideo = async (id) => {
-    await fetch(`${API}/${id}`, {
-      method: "DELETE",
-    });
+    await fetch(`${API}/${id}`, { method: "DELETE" });
     loadVideos();
   };
 
   const updateVideo = async (id) => {
-    const newName = prompt("Enter new name:");
-    const newTime = prompt("Enter new time:");
+    const newName = prompt("New name:");
+    const newTime = prompt("New time:");
 
     if (!newName || !newTime) return;
 
     await fetch(`${API}/${id}`, {
       method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name: newName, time: newTime }),
     });
 
@@ -62,56 +52,118 @@ function App() {
   };
 
   return (
-    <div style={{ padding: 20, fontFamily: "Arial" }}>
-      <h1>🎬 Video Manager</h1>
+    <div
+      style={{
+        minHeight: "100vh",
+        background: "linear-gradient(135deg, #0f2027, #203a43, #2c5364)",
+        padding: "30px",
+        color: "white",
+        fontFamily: "Poppins",
+      }}
+    >
+      <h1 style={{ textAlign: "center", marginBottom: "30px" }}>
+        🎬 Video Manager
+      </h1>
 
-      <div style={{ marginBottom: 20 }}>
+      {/* INPUT SECTION */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          gap: "10px",
+          marginBottom: "30px",
+        }}
+      >
         <input
           placeholder="Video name"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          style={{ marginRight: 10, padding: 8 }}
+          style={{
+            padding: "10px",
+            borderRadius: "8px",
+            border: "none",
+          }}
         />
 
         <input
           placeholder="Time"
           value={time}
           onChange={(e) => setTime(e.target.value)}
-          style={{ marginRight: 10, padding: 8 }}
+          style={{
+            padding: "10px",
+            borderRadius: "8px",
+            border: "none",
+          }}
         />
 
-        <button onClick={addVideo}>Add</button>
+        <button
+          onClick={addVideo}
+          style={{
+            background: "#00c896",
+            border: "none",
+            padding: "10px 20px",
+            borderRadius: "8px",
+            color: "white",
+            cursor: "pointer",
+          }}
+        >
+          Add
+        </button>
       </div>
 
-      {videos.length === 0 ? (
-        <p>No videos found</p>
-      ) : (
-        videos.map((video) => (
+      {/* VIDEO GRID */}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
+          gap: "20px",
+        }}
+      >
+        {videos.map((video) => (
           <div
             key={video.id}
             style={{
-              border: "1px solid #ccc",
-              padding: 10,
-              marginBottom: 10,
-              borderRadius: 8,
+              background: "rgba(255,255,255,0.1)",
+              padding: "20px",
+              borderRadius: "15px",
+              backdropFilter: "blur(10px)",
+              transition: "0.3s",
             }}
           >
-            <b>{video.name}</b> ({video.time})
-            <br />
+            <h3>{video.name}</h3>
+            <p>{video.time}</p>
 
-            <button onClick={() => deleteVideo(video.id)}>
+            <button
+              onClick={() => deleteVideo(video.id)}
+              style={{
+                background: "#ff4d4d",
+                border: "none",
+                padding: "8px",
+                borderRadius: "6px",
+                color: "white",
+                marginRight: "10px",
+                cursor: "pointer",
+              }}
+            >
               Delete
             </button>
 
             <button
               onClick={() => updateVideo(video.id)}
-              style={{ marginLeft: 10 }}
+              style={{
+                background: "#ffaa00",
+                border: "none",
+                padding: "8px",
+                borderRadius: "6px",
+                color: "white",
+                cursor: "pointer",
+              }}
             >
               Edit
             </button>
           </div>
-        ))
-      )}
+        ))}
+      </div>
     </div>
   );
 }
